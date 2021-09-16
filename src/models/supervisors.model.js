@@ -9,10 +9,6 @@ exports.Supervisors=sequelize.define(
             primaryKey: true,
             defaultValue: Sequelize.UUIDV4,
         },
-        emp_id:{
-            allowNull: false,
-            type: Sequelize.UUID,
-        },
         supervisor_id:{
             allowNull:true,
             type:Sequelize.UUID,

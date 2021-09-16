@@ -17,55 +17,14 @@ exports.EmployeeKpi = sequelize.define(
             allowNull: false,
             type: Sequelize.UUID,
         },
-        kpi_session_id: {
-            allowNull: false,
-            type: Sequelize.UUID,
-        },
-        feedback_emp_id: {
-            allowNull: false,
-            type: Sequelize.UUID,
-        },
-
-        availability: {
-            allowNull: true,
-            type: Sequelize.INTEGER,
-        },
-        ontime: {
-            allowNull: true,
-            type: Sequelize.INTEGER,
-        },
-        punctuality: {
-            allowNull: true,
-            type: Sequelize.INTEGER,
-        },
-        regularity: {
-            allowNull: true,
-            type: Sequelize.INTEGER,
-        },
-        timetorepair: {
-            allowNull: true,
-            type: Sequelize.INTEGER,
-        },
-        criticalproblemsolving: {
-            allowNull: true,
-            type: Sequelize.INTEGER,
-        },
-        clienthandling: {
-            allowNull: true,
-            type: Sequelize.INTEGER,
-        },
-        innovative: {
-            allowNull: true,
-            type: Sequelize.INTEGER,
-        },
-        teamPlayer: {
-            allowNull: true,
-            type: Sequelize.INTEGER,
-        },
-        dependibility: {
-            allowNull: true,
-            type: Sequelize.INTEGER,
-        },
+    //     kpi_session_id: {
+    //         allowNull: false,
+    //         type: Sequelize.UUID,
+    //     },
+        kpi_details:{
+            allowNull:true,
+            type:Sequelize.JSON()
+        }
 
     }
 )

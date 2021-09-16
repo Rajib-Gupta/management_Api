@@ -12,7 +12,8 @@ exports.Session=sequelize.define(
         },
         session:{
             allowNull: false,
-            type: Sequelize.INTEGER,
+            type: Sequelize.ENUM,
+            values:['1','2','3']
         }
     }
   );

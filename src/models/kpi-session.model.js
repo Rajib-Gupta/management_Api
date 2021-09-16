@@ -9,8 +9,9 @@ exports.Kpi_session=sequelize.define(
             defaultValue: Sequelize.UUIDV4,
         },
         session_id:{
-            type: Sequelize.UUID,
             allowNull: false,
+            type: Sequelize.ENUM,
+            values:['1','2','3']
         },
         year:{
             allowNull:false,

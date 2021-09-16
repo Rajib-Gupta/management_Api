@@ -35,11 +35,11 @@ exports.Employee = sequelize.define(
         },
         dob: {
             allowNull: false,
-            type: Sequelize.DATE,
+            type: Sequelize.DATEONLY,
         },
-        doe: {
+        doj: {
             allowNull: false,
-            type: Sequelize.DATE,
+            type: Sequelize.DATEONLY,
         },
         dpt: {
             allowNull: false,
@@ -53,10 +53,16 @@ exports.Employee = sequelize.define(
         status: {
             allowNull: false,
             type: Sequelize.ENUM,
-            values: ['0', '1'],  allowNull: false,
-            type: Sequelize.ENUM,
             values: ['0', '1'],
         },
+        image:{
+            allowNull:true,
+            type:Sequelize.STRING
+        },
+        desig:{
+            allowNull: false,
+            type: Sequelize.STRING,
+        }
     
 
     }
