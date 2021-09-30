@@ -14,6 +14,10 @@ exports.EmployeeKpi = sequelize.define(
             type: Sequelize.UUID,
         },
         supervisor_id: {
+            allowNull: true,
+            type: Sequelize.UUID,
+        },
+        givenby_id:{
             allowNull: false,
             type: Sequelize.UUID,
         },

@@ -25,11 +25,14 @@ Employee.belongsTo(Employee, {
 // Employee.hasMany(Supervisors)
 // Supervisors.belongsTo(Employee)
 
-/*Session.hasMany(Kpi_session)
-Kpi_session.belongsTo(Session)*/
+Session.hasMany(Kpi_session)
+Kpi_session.belongsTo(Session)
 
 Kpi_session.hasMany(EmployeeKpi)
 EmployeeKpi.belongsTo(Kpi_session)
+
+Employee.hasOne(EmployeeKpi, { foreignKey: "emp_id"})
+EmployeeKpi.belongsTo(Employee, { foreignKey: "emp_id" })
 
 sequelize
   .sync({

@@ -32,4 +32,28 @@ exports.masterLogin = async (req, res) => {
     }
 };
 
+exports.passwordRest = async (req, res) => {
+    const id  = req.params.emp_id
+    const { password, newPassword } = req.body
+    try {
+        const user = await Employee.findOne({ where: { id } })
+        if (user.password === password) {
+            const upgrade = await user.update({ password: newPassword })
+            if (!upgrade) {
+                throw new Error({ message: "Please check!" })
+            }
+            res.status(200).json({ success: true, upgrade, message: "Successfully updated!" })
+        }
+        else {
+            return res.status(404).json({ success: false, message: "Please check your old password!" })
+        }
+
+
+        
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ success: false, error, message: createError.InternalServerError() })
+    }
+}
+
 

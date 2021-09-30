@@ -2,6 +2,8 @@ const creatError = require("http-errors")
 const { Supervisors } = require("../models/supervisors.model")
 const { Employee } = require("../models/employee.model");
 const { sequelize } = require("../database/client");
+const { EmployeeKpi } = require("../models/employee_kpi.model");
+const { Op } = require("sequelize");
 
 
 // exports.addSupervisor = async (req, res) => {
@@ -62,10 +64,19 @@ exports.updateSuper = async (req, res) => {
 
 exports.getEmpUnderSup = async (req, res) => {
     try {
-        const sup = await Supervisors.findOne({
-            where: { supervisor_id: req.params.supId }, include: {
-                model: Employee,
-            }
+        console.log('req.params.supId', req.params.supId)
+        const sup = await Employee.findAndCountAll({
+            where: {
+                supervisor_id: req.params.supId, id: {
+                    [Op.not]: req.params.supId
+                }
+            },
+            include: {
+                model: EmployeeKpi,
+                where: { supervisor_id: req.params.supId },
+                required: false
+            },
+            attributes: { exclude: ["password"] }
         }
 
         )
