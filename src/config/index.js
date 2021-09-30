@@ -7,7 +7,7 @@ module.exports = {
     PASSWORD: process.env.MYSQL_PASSWORD
   },
   app: {
-    PORT: process.env.PORT,
+    PORT: process.env.NODE_ENV!=="production"? process.env.PORT:process.env.SERVER_PORT,
     HOST: process.env.HOST
   }
 
