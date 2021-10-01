@@ -39,8 +39,9 @@ exports.addSession = async (req, res) => {
     const { year, is_active, is_completed } = req.body
     const t = await sequelize.transaction();
     try {
-        const runningSession = await Kpi_session.findOne({is_active : 1})
-        if(runningSession) return res.status(400).json({message:"Another session already running, Please close the Session to add a new Session!", success:false })
+        const runningSession = await Kpi_session.findOne({ where: { is_active: 1 } })
+        console.log(runningSession)
+        if (runningSession) return res.status(400).json({ message: "Another session already running, Please close the Session to add a new Session!", success: false })
         const part = await Session.create({ session }, { transaction: t })
 
         const store = part.toJSON()
@@ -107,8 +108,8 @@ exports.kpiActiveSession = async (req, res) => {
 
             include: [{
                 model: Session,
-
-                attributes: ['session']
+                attributes: ['session'],
+               
             }]
         },
             { transaction: t }
@@ -136,10 +137,14 @@ exports.getKpiSuper = async (req, res) => {
 
             include: [{
                 model: Session,
-
-                attributes: ['session']
+                 attributes: ['session'],
+                              
+            },{
+                model:EmployeeKpi
             }]
-        },
+           
+        }
+       ,
             { transaction: t }
         )
         await t.commit()
@@ -147,6 +152,7 @@ exports.getKpiSuper = async (req, res) => {
 
     } catch (error) {
         await t.rollback()
+        console.log(error)
         res.status(500).json({ success: false, server: creatError.InternalServerError(), message: error.message })
 
     }
@@ -219,11 +225,11 @@ exports.getSessionAndKpidetails = async (req, res) => {
 
 
         data.forEach(d => {
-            if(d.sup_kpi_details) {
+            if (d.sup_kpi_details) {
                 d.sup_kpi_details = JSON.parse(d.sup_kpi_details)
             }
 
-            if(d.emp_kpi_details) {
+            if (d.emp_kpi_details) {
                 d.emp_kpi_details = JSON.parse(d.emp_kpi_details)
             }
         })
@@ -258,20 +264,20 @@ exports.kpideleteSession = async (req, res) => {
  * 
  *  */
 
-exports.getKpiById=async(req,res)=>{
+exports.getKpiById = async (req, res) => {
 
-    const id=req.params.id
+    const id = req.params.id
     try {
-        const data= await EmployeeKpi.findOne({where:{id}})
-        if(!data){
-            return res.status(404).json({success:false,message:"Employee not Found!"})
+        const data = await EmployeeKpi.findOne({ where: { id } })
+        if (!data) {
+            return res.status(404).json({ success: false, message: "Employee not Found!" })
         }
-        
-        data.kpi_details= JSON.parse( data.kpi_details)
-        res.status(200).json({success:true,data,message:"Successfully Fetched!"})
+
+        data.kpi_details = JSON.parse(data.kpi_details)
+        res.status(200).json({ success: true, data, message: "Successfully Fetched!" })
     } catch (error) {
-        
-        res.status(500).json({success:false,error,message:creatError.InternalServerError()})
+
+        res.status(500).json({ success: false, error, message: creatError.InternalServerError() })
     }
 }
 
@@ -279,25 +285,28 @@ exports.getKpiById=async(req,res)=>{
  * See kpi details of employee own and employee under
  */
 
-exports.kpiDetailsEmployeeOwn= async(req,res)=>{
-    const {emp_id,givenby_id}=req.params
-  
+exports.kpiDetailsEmployeeOwn = async (req, res) => {
+    const { emp_id, givenby_id } = req.params
+
     try {
-        const kpiData=await EmployeeKpi.findOne({where:{emp_id,givenby_id},include:[{
-            model:Kpi_session,
-            where:{is_active:1},
-            include:[{
-                model:Session
-            }]
-        }]})
-        if(!kpiData){
-            return res.status(404).json({success:false,message:"Employee not Found!"})
+        const kpiData = await EmployeeKpi.findOne({
+            where: { emp_id, givenby_id }, include: [{
+                model: Kpi_session,
+                //where: { is_active: 1 },
+                include: [{
+                    model: Session,
+                
+                }]
+            }], group: ["givenby_id"]
+        })
+        if (!kpiData) {
+            return res.status(404).json({ success: false, message: "Employee not Found!" })
         }
-        kpiData.kpi_details= JSON.parse( kpiData.kpi_details)
-        res.status(200).json({success:true,kpiData,message:"Successfully Fetched!"})
-        
+        kpiData.kpi_details = JSON.parse(kpiData.kpi_details)
+        res.status(200).json({ success: true, kpiData, message: "Successfully Fetched!" })
+
     } catch (error) {
         console.log(error)
-        res.status(500).json({success:false,error,message:creatError.InternalServerError()})
+        res.status(500).json({ success: false, error, message: creatError.InternalServerError() })
     }
 }
