@@ -4,6 +4,7 @@ const { EmployeeKpi } = require("../models/employee_kpi.model");
 const { Kpi_session } = require("../models/kpi-session.model");
 const { Session } = require("../models/session.model");
 const { sequelize } = require("../database/client");
+const Sequelize = require("sequelize");
 
 exports.kpiSession = async (req, res) => {
     const session_id = req.params?.ssId
@@ -102,14 +103,15 @@ exports.getKpiDetails = async (req, res) => {
 
 exports.kpiActiveSession = async (req, res) => {
     const sessionId = req.params.session_id
-    const t = await sequelize.transaction();
+
+    const t = await sequelize.transaction({ isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.SERIALIZABLE });
     try {
         const sql = await Kpi_session.findAndCountAll({
-
+            lock: true,
             include: [{
                 model: Session,
                 attributes: ['session'],
-               
+
             }]
         },
             { transaction: t }
@@ -137,14 +139,14 @@ exports.getKpiSuper = async (req, res) => {
 
             include: [{
                 model: Session,
-                 attributes: ['session'],
-                              
-            },{
-                model:EmployeeKpi
+                attributes: ['session'],
+
+            }, {
+                model: EmployeeKpi
             }]
-           
+
         }
-       ,
+            ,
             { transaction: t }
         )
         await t.commit()
@@ -295,7 +297,7 @@ exports.kpiDetailsEmployeeOwn = async (req, res) => {
                 //where: { is_active: 1 },
                 include: [{
                     model: Session,
-                
+
                 }]
             }], group: ["givenby_id"]
         })
