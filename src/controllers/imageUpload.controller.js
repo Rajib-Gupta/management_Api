@@ -20,8 +20,9 @@ exports.uploads = multer({ storage: storage });
 
 
 exports.imageUpload = async (req, res) => {
-    if (!req.file || Object.keys(req.file).length === 0) {
-        return res.status(400).send("No file were uploaded.");
+    if (!req.file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF|JFIF)$/i) || Object.keys(req.file).length === 0) {
+       // return res.status(400).send("No file were uploaded.");
+       return res.status(400).json({success:false,message:"Please check file type!"})
     }
 
     const id = req.params.emp_id;
@@ -32,6 +33,7 @@ exports.imageUpload = async (req, res) => {
         );
         res.send(results);
     } catch (error) {
+        console.log(error)
         res.status(500).json({ message: error.message });
     }
 };

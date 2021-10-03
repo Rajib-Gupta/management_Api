@@ -42,7 +42,10 @@ exports.addSession = async (req, res) => {
     try {
         const runningSession = await Kpi_session.findOne({ where: { is_active: 1 } })
         console.log(runningSession)
-        if (runningSession) return res.status(400).json({ message: "Another session already running, Please close the Session to add a new Session!", success: false })
+        if (runningSession) 
+        {
+            return res.status(400).json({ message: "Another session already running, Please close the Session to add a new Session!", success: false })
+        }
         const part = await Session.create({ session }, { transaction: t })
 
         const store = part.toJSON()
@@ -190,6 +193,7 @@ exports.getSessionAndKpidetails = async (req, res) => {
         CONCAT(sup.f_name, ' ', sup.l_name) as 'from_emp',
         kpi.emp_id,
         kpi.givenby_id,
+        kpi.supervisor_id,
          emp_kpi.kpi_details as "emp_kpi_details",
         sup_kpi.kpi_details as "sup_kpi_details",
         AVG(
@@ -226,20 +230,25 @@ exports.getSessionAndKpidetails = async (req, res) => {
         kpi.emp_id `)
 
 
-        data.forEach(d => {
-            if (d.sup_kpi_details) {
-                d.sup_kpi_details = JSON.parse(d.sup_kpi_details)
-            }
+        // data.forEach(d => {
+        //     if (d.sup_kpi_details) {
+        //        // d.sup_kpi_details = JSON.parse(d.sup_kpi_details)
+        //         console.log("=========",d.sup_kpi_details)
+              
+        //     }
 
-            if (d.emp_kpi_details) {
-                d.emp_kpi_details = JSON.parse(d.emp_kpi_details)
-            }
-        })
-        console.log("=========", data)
+        //     if (d.emp_kpi_details) {
+        //        // d.emp_kpi_details = JSON.parse(d.emp_kpi_details)
+        //         console.log("=========", d.emp_kpi_details)
+        //     }
+        // })
+        // console.log("=========", data)
+      
 
         res.status(200).json({ success: true, data, message: "Data fetched Successfully" })
 
     } catch (error) {
+        console.log(error)
 
         res.status(500).json({ success: false, error, message: creatError.InternalServerError() })
     }
@@ -275,10 +284,10 @@ exports.getKpiById = async (req, res) => {
             return res.status(404).json({ success: false, message: "Employee not Found!" })
         }
 
-        data.kpi_details = JSON.parse(data.kpi_details)
+        //data.kpi_details = JSON.parse(data.kpi_details)
         res.status(200).json({ success: true, data, message: "Successfully Fetched!" })
     } catch (error) {
-
+       
         res.status(500).json({ success: false, error, message: creatError.InternalServerError() })
     }
 }
@@ -304,7 +313,7 @@ exports.kpiDetailsEmployeeOwn = async (req, res) => {
         if (!kpiData) {
             return res.status(404).json({ success: false, message: "Employee not Found!" })
         }
-        kpiData.kpi_details = JSON.parse(kpiData.kpi_details)
+       // kpiData.kpi_details = JSON.parse(kpiData.kpi_details)
         res.status(200).json({ success: true, kpiData, message: "Successfully Fetched!" })
 
     } catch (error) {

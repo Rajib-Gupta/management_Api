@@ -13,7 +13,7 @@ exports.masterLogin = async (req, res) => {
 
         // var { password, ...master } = rows.length ? { ...rows[0] } : {};
         if (!employee) {
-            res.json(createError.BadRequest());
+            res.status(404).json({success:false,message:"Please check login credentials!"});
         }
         else {
             let payload = { subject: email };
@@ -27,8 +27,8 @@ exports.masterLogin = async (req, res) => {
         }
     }
     catch (error) {
-        console.log(error.message);
-        res.json(createError.BadRequest("Invalid user!"));
+        //console.log(error.message);
+        res.status(500).json({success:false,message:createError.InternalServerError()})
     }
 };
 
