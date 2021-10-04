@@ -56,6 +56,7 @@ exports.addSession = async (req, res) => {
 
     } catch (error) {
         await t.rollback()
+        console.log(error)
         res.status(500).json({ success: false, server: creatError.InternalServerError(), message: error.message })
     }
 }
