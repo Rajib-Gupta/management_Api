@@ -190,45 +190,60 @@ exports.getSessionAndKpidetails = async (req, res) => {
         kpi_ses.year,
         sess.session,
         kpi.id,
-        CONCAT(emp.f_name, ' ', emp.l_name) as 'to_emp',
-        CONCAT(sup.f_name, ' ', sup.l_name) as 'from_emp',
         kpi.emp_id,
         kpi.givenby_id,
         kpi.supervisor_id,
-         emp_kpi.kpi_details as "emp_kpi_details",
-        sup_kpi.kpi_details as "sup_kpi_details",
+        CONCAT(emp.f_name, ' ', emp.l_name) AS 'to_emp',
+        CONCAT(sup.f_name, ' ', sup.l_name) AS 'from_emp',
+        -- AVG(
+        --     JSON_VALUE(emp_kpi.kpi_details, '$.availability') + JSON_VALUE(emp_kpi.kpi_details, '$.ontime') + JSON_VALUE(emp_kpi.kpi_details, '$.punctuality') + JSON_VALUE(emp_kpi.kpi_details, '$.regularity') + JSON_VALUE(emp_kpi.kpi_details, '$.timetorepair') + JSON_VALUE(
+        --         emp_kpi.kpi_details,
+        --         '$.criticalproblemsolving'
+        --     ) + JSON_VALUE(emp_kpi.kpi_details, '$.clienthandling') + JSON_VALUE(emp_kpi.kpi_details, '$.innovative') + JSON_VALUE(emp_kpi.kpi_details, '$.teamPlayer') + JSON_VALUE(emp_kpi.kpi_details, '$.dependibility')
+        -- ) AS 'emp_avg',
+        -- AVG(
+        --     JSON_VALUE(sup_kpi.kpi_details, '$.availability') + JSON_VALUE(sup_kpi.kpi_details, '$.ontime') + JSON_VALUE(sup_kpi.kpi_details, '$.punctuality') + JSON_VALUE(sup_kpi.kpi_details, '$.regularity') + JSON_VALUE(sup_kpi.kpi_details, '$.timetorepair') + JSON_VALUE(
+        --         sup_kpi.kpi_details,
+        --         '$.criticalproblemsolving'
+        --     ) + JSON_VALUE(sup_kpi.kpi_details, '$.clienthandling') + JSON_VALUE(sup_kpi.kpi_details, '$.innovative') + JSON_VALUE(sup_kpi.kpi_details, '$.teamPlayer') + JSON_VALUE(sup_kpi.kpi_details, '$.dependibility')
+        -- ) AS 'sup_avg',
         AVG(
-            JSON_VALUE(emp_kpi.kpi_details, '$.availability') + JSON_VALUE(emp_kpi.kpi_details, '$.ontime') + JSON_VALUE(emp_kpi.kpi_details, '$.punctuality') + JSON_VALUE(emp_kpi.kpi_details, '$.regularity') + JSON_VALUE(emp_kpi.kpi_details, '$.timetorepair') + JSON_VALUE(
-                emp_kpi.kpi_details,
-                '$.criticalproblemsolving'
-            ) + JSON_VALUE(emp_kpi.kpi_details, '$.clienthandling') + JSON_VALUE(emp_kpi.kpi_details, '$.innovative') + JSON_VALUE(emp_kpi.kpi_details, '$.teamPlayer') + JSON_VALUE(emp_kpi.kpi_details, '$.dependibility')
-        ) AS 'emp_avg',
-        AVG(
-            JSON_VALUE(sup_kpi.kpi_details, '$.availability') + JSON_VALUE(sup_kpi.kpi_details, '$.ontime') + JSON_VALUE(sup_kpi.kpi_details, '$.punctuality') + JSON_VALUE(sup_kpi.kpi_details, '$.regularity') + JSON_VALUE(sup_kpi.kpi_details, '$.timetorepair') + JSON_VALUE(
-                sup_kpi.kpi_details,
-                '$.criticalproblemsolving'
-            ) + JSON_VALUE(sup_kpi.kpi_details, '$.clienthandling') + JSON_VALUE(sup_kpi.kpi_details, '$.innovative') + JSON_VALUE(sup_kpi.kpi_details, '$.teamPlayer') + JSON_VALUE(sup_kpi.kpi_details, '$.dependibility')
-        ) AS 'sup_avg',
-        AVG(
-            JSON_VALUE(kpi.kpi_details, '$.availability') + JSON_VALUE(kpi.kpi_details, '$.ontime') + JSON_VALUE(kpi.kpi_details, '$.punctuality') + JSON_VALUE(kpi.kpi_details, '$.regularity') + JSON_VALUE(kpi.kpi_details, '$.timetorepair') + JSON_VALUE(
+            JSON_VALUE(
+                kpi.kpi_details,
+                '$.availability'
+            ) + JSON_VALUE(kpi.kpi_details, '$.ontime') + JSON_VALUE(kpi.kpi_details, '$.punctuality') + JSON_VALUE(kpi.kpi_details, '$.regularity') + JSON_VALUE(
+                kpi.kpi_details,
+                '$.timetorepair'
+            ) + JSON_VALUE(
                 kpi.kpi_details,
                 '$.criticalproblemsolving'
-            ) + JSON_VALUE(kpi.kpi_details, '$.clienthandling') + JSON_VALUE(kpi.kpi_details, '$.innovative') + JSON_VALUE(kpi.kpi_details, '$.teamPlayer') + JSON_VALUE(kpi.kpi_details, '$.dependibility')
+            ) + JSON_VALUE(
+                kpi.kpi_details,
+                '$.clienthandling'
+            ) + JSON_VALUE(kpi.kpi_details, '$.innovative') + JSON_VALUE(kpi.kpi_details, '$.teamPlayer') + JSON_VALUE(
+                kpi.kpi_details,
+                '$.dependibility'
+            )
         ) AS 'total_avg'
     FROM
-        management.kpi_sessions AS kpi_ses
-        -- Filter By Session Type
-        INNER JOIN management.sessions AS sess ON sess.id = kpi_ses.sessionId AND sess.session = ${session}
-        -- Connect Session and KPI's
-        INNER JOIN management.employee_kpis AS kpi ON kpi.kpiSessionId = kpi_ses.id
-        LEFT JOIN management.employee_kpis AS emp_kpi ON (emp_kpi.givenby_id = emp_kpi.emp_id) AND (emp_kpi.givenby_id = kpi.givenby_id) AND (kpi.emp_id = kpi.givenby_id)
-        LEFT JOIN management.employee_kpis AS sup_kpi ON (sup_kpi.givenby_id != sup_kpi.emp_id) AND (sup_kpi.givenby_id = kpi.givenby_id) AND (kpi.emp_id != kpi.givenby_id)
-        INNER JOIN employees as emp ON emp.id = kpi.emp_id
-        LEFT JOIN employees as sup ON sup.id = emp.supervisor_id
+        management.kpi_sessions AS kpi_ses -- Filter By Session Type
+    INNER JOIN management.sessions AS sess
+    ON
+        sess.id = kpi_ses.sessionId AND sess.session = ${session} -- Connect Session and KPI's
+    INNER JOIN management.employee_kpis AS kpi
+    ON
+        kpi.kpiSessionId = kpi_ses.id -- LEFT JOIN management.employee_kpis AS emp_kpi ON (emp_kpi.givenby_id = emp_kpi.emp_id) AND (emp_kpi.givenby_id = kpi.givenby_id) AND (kpi.emp_id = kpi.givenby_id)
+        -- LEFT JOIN management.employee_kpis AS sup_kpi ON (sup_kpi.givenby_id != sup_kpi.emp_id) AND (sup_kpi.givenby_id = kpi.givenby_id) AND (kpi.emp_id != kpi.givenby_id)
+    INNER JOIN employees AS emp
+    ON
+        emp.id = kpi.emp_id
+    LEFT JOIN employees AS sup
+    ON
+        sup.id = emp.supervisor_id
     WHERE
         kpi_ses.year = ${year}
     GROUP BY
-        kpi.emp_id `)
+        kpi.id`)
 
 
         // data.forEach(d => {
