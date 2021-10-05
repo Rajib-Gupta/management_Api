@@ -4,6 +4,7 @@ const { Employee } = require("../models/employee.model");
 const { sequelize } = require("../database/client");
 const { EmployeeKpi } = require("../models/employee_kpi.model");
 const { Op } = require("sequelize");
+const { Kpi_session } = require("../models/kpi-session.model");
 
 
 // exports.addSupervisor = async (req, res) => {
