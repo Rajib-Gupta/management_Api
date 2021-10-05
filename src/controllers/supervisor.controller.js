@@ -72,16 +72,16 @@ exports.getEmpUnderSup = async (req, res) => {
                     [Op.not]: req.params.supId
                 }
             },
-            include: {
+            include: [{
                 model: EmployeeKpi,
                 where: { supervisor_id: req.params.supId },
                 required: false,
-                include: {
-                    model: Kpi_session,
-                    where: { is_active: 1 },
-                    required: false,
-                }
-            },
+                
+            }, {
+                model: Kpi_session,
+                where: { is_active: 1 },
+                required: false,
+            }],
             attributes: { exclude: ["password"] }
         }
 
