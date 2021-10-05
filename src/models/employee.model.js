@@ -27,7 +27,7 @@ exports.Employee = sequelize.define(
         },
         phone: {
             allowNull: false,
-            type: Sequelize.INTEGER,
+            type: Sequelize.STRING,
         },
         password: {
             allowNull: false,

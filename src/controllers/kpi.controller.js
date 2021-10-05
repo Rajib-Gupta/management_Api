@@ -42,8 +42,7 @@ exports.addSession = async (req, res) => {
     try {
         const runningSession = await Kpi_session.findOne({ where: { is_active: 1 } })
         console.log(runningSession)
-        if (runningSession) 
-        {
+        if (runningSession) {
             return res.status(400).json({ message: "Another session already running, Please close the Session to add a new Session!", success: false })
         }
         const part = await Session.create({ session }, { transaction: t })
@@ -311,7 +310,7 @@ exports.getSessionAndKpidetails = async (req, res) => {
         //     if (d.sup_kpi_details) {
         //        // d.sup_kpi_details = JSON.parse(d.sup_kpi_details)
         //         console.log("=========",d.sup_kpi_details)
-              
+
         //     }
 
         //     if (d.emp_kpi_details) {
@@ -320,7 +319,7 @@ exports.getSessionAndKpidetails = async (req, res) => {
         //     }
         // })
         // console.log("=========", data)
-      
+
 
         res.status(200).json({ success: true, data, message: "Data fetched Successfully" })
 
@@ -364,7 +363,7 @@ exports.getKpiById = async (req, res) => {
         //data.kpi_details = JSON.parse(data.kpi_details)
         res.status(200).json({ success: true, data, message: "Successfully Fetched!" })
     } catch (error) {
-       
+
         res.status(500).json({ success: false, error, message: creatError.InternalServerError() })
     }
 }
@@ -373,24 +372,68 @@ exports.getKpiById = async (req, res) => {
  * See kpi details of employee own and employee under
  */
 
+// exports.kpiDetailsEmployeeOwn = async (req, res) => {
+//     const { emp_id, givenby_id } = req.params
+
+//     try {
+//         const kpiData = await EmployeeKpi.findOne({
+//             where: { emp_id, givenby_id }, include: [{
+//                 model: Kpi_session,
+//                 //where: { is_active: 1 },
+//                 include: [{
+//                     model: Session,
+
+//                 }]
+//             }], group: ["givenby_id"]
+//         })
+//         if (!kpiData) {
+//             return res.status(404).json({ success: false, message: "Employee not Found!" })
+//         }
+//        // kpiData.kpi_details = JSON.parse(kpiData.kpi_details)
+//         res.status(200).json({ success: true, kpiData, message: "Successfully Fetched!" })
+
+//     } catch (error) {
+//         console.log(error)
+//         res.status(500).json({ success: false, error, message: creatError.InternalServerError() })
+//     }
+// }
 exports.kpiDetailsEmployeeOwn = async (req, res) => {
     const { emp_id, givenby_id } = req.params
 
     try {
-        const kpiData = await EmployeeKpi.findOne({
-            where: { emp_id, givenby_id }, include: [{
-                model: Kpi_session,
-                //where: { is_active: 1 },
-                include: [{
-                    model: Session,
+        const kpiData = await sequelize.query(`SELECT
+        kpi.id,
+        kpi.emp_id,
+        kpi.supervisor_id,
+        kpi.givenby_id,
+        kpi.kpi_details,
+        kpi.createdAt,
+        kpi.updatedAt,
+        kpi.kpiSessionId,
+        kpi_ses.id,
+        kpi_ses.year,
+        kpi_ses.is_active,
+        kpi_ses.is_completed,
+        kpi_ses.createdAt,
+        kpi_ses.updatedAt,
+        kpi_ses.sessionId
+    FROM
+        employee_kpis AS kpi
+    INNER JOIN kpi_sessions AS kpi_ses
+    ON
+        kpi.kpiSessionId = kpi_ses.id
+    INNER JOIN sessions AS sess
+    ON
+        sess.id = kpi_ses.sessionId
+    WHERE
+        kpi.emp_id =${emp_id} AND kpi.givenby_id = ${givenby_id}
+        
+        GROUP by sess.id, kpi_ses.id, kpi.id`)
 
-                }]
-            }], group: ["givenby_id"]
-        })
         if (!kpiData) {
             return res.status(404).json({ success: false, message: "Employee not Found!" })
         }
-       // kpiData.kpi_details = JSON.parse(kpiData.kpi_details)
+        // kpiData.kpi_details = JSON.parse(kpiData.kpi_details)
         res.status(200).json({ success: true, kpiData, message: "Successfully Fetched!" })
 
     } catch (error) {
