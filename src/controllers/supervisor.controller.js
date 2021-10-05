@@ -79,7 +79,8 @@ exports.getEmpUnderSup = async (req, res) => {
                 include: {
                     model: Kpi_session,
                     required: false,
-                }
+                },
+                group: ["emp_id"]
 
             },
             attributes: { exclude: ["password"] }
