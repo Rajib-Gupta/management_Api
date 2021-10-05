@@ -401,7 +401,7 @@ exports.kpiDetailsEmployeeOwn = async (req, res) => {
     const { emp_id, givenby_id } = req.params
 
     try {
-        const kpiData = await sequelize.query(`SELECT kpi.id,kpi.emp_id,kpi.supervisor_id,kpi.givenby_id,kpi.kpi_details,kpi.createdAt,kpi.updatedAt,kpi.kpiSessionId,kpi_ses.id,kpi_ses.year,kpi_ses.is_active,kpi_ses.is_completed,kpi_ses.createdAt,kpi_ses.updatedAt,kpi_ses.sessionId FROM employee_kpis AS kpi INNER JOIN kpi_sessions AS kpi_ses ON kpi.kpiSessionId = kpi_ses.id INNER JOIN sessions AS sess ON sess.id = kpi_ses.sessionId WHERE kpi.emp_id ="${emp_id}" AND kpi.givenby_id = "${givenby_id}" GROUP by sess.id, kpi_ses.id, kpi.id`)
+        const [kpiData, metadata] = await sequelize.query(`SELECT kpi.id,kpi.emp_id,kpi.supervisor_id,kpi.givenby_id,kpi.kpi_details,kpi.createdAt,kpi.updatedAt,kpi.kpiSessionId,kpi_ses.id,kpi_ses.year,kpi_ses.is_active,kpi_ses.is_completed,kpi_ses.createdAt,kpi_ses.updatedAt,kpi_ses.sessionId FROM employee_kpis AS kpi INNER JOIN kpi_sessions AS kpi_ses ON kpi.kpiSessionId = kpi_ses.id INNER JOIN sessions AS sess ON sess.id = kpi_ses.sessionId WHERE kpi.emp_id ="${emp_id}" AND kpi.givenby_id = "${givenby_id}" GROUP by sess.id, kpi_ses.id, kpi.id`)
         if (!kpiData) {
             return res.status(404).json({ success: false, message: "Employee not Found!" })
         }
