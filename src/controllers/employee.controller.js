@@ -1,7 +1,9 @@
 const creatError = require("http-errors");
 const { Employee } = require("../models/employee.model");
 const { Supervisors } = require("../models/supervisors.model");
-
+const { EmployeeKpi } = require("../models/employee_kpi.model");
+const { Kpi_session } = require("../models/kpi-session.model");
+const { Session } = require("../models/session.model")
 exports.create = async (req, res) => {
     const {
         emp_id,
@@ -132,7 +134,18 @@ exports.updateEmployee = async (req, res) => {
 exports.getUserById = async (req, res) => {
     const id = req.params.userId;
     try {
-        const employee = await Employee.findOne({ where: { id },attributes:{exclude:["password"]}});
+        const employee = await Employee.findOne({ where: { id }, include:{
+             model: EmployeeKpi,
+                include: {
+                    model: Kpi_session,
+
+                    where:{is_active: 1},
+                include: {
+                    model: Session,
+                },
+                },
+
+        },attributes:{exclude:["password"]}});
         console.log(employee)
         if (!employee) {
             return res.status(404).json(creatError.BadRequest());

@@ -5,7 +5,7 @@ const { sequelize } = require("../database/client");
 const { EmployeeKpi } = require("../models/employee_kpi.model");
 const { Op } = require("sequelize");
 const { Kpi_session } = require("../models/kpi-session.model");
-
+const { Session } = require("../models/session.model")
 
 // exports.addSupervisor = async (req, res) => {
 //   const employeeId = req.params?.empId
@@ -66,27 +66,45 @@ exports.updateSuper = async (req, res) => {
 exports.getEmpUnderSup = async (req, res) => {
     try {
         console.log('req.params.supId', req.params.supId)
+        // const sup = await EmployeeKpi.findAndCountAll({
+        //     // where: { supervisor_id: req.params.supId },
+        //     // group: ["emp_id"],
+        //     right: true,
+        //     include: [/*{
+        //         model: Kpi_session,
+        //         where: { is_active: 1 },
+
+        //     },*/
+        //         {
+        //             model: Employee,
+        //             // where: {
+        //                 // supervisor_id: req.params.supId
+        //             // }
+        //         }]
+        // })
+
         const sup = await Employee.findAndCountAll({
             where: {
                 supervisor_id: req.params.supId, id: {
                     [Op.not]: req.params.supId
                 }
-            }, group: ["id"],
+            },
+            group: ["id"],
             include: {
                 model: EmployeeKpi,
-                where: { supervisor_id: req.params.supId },
                 required: false,
+                where: { supervisor_id: req.params.supId },
                 include: {
+                    // right: true,
                     model: Kpi_session,
-                    required: false,
+                    where: {is_active: 1}
                 },
-               
-
             },
             attributes: { exclude: ["password"] }
         }
 
         )
+
         if (!sup) {
             return res.json(creatError.InternalServerError())
         }
