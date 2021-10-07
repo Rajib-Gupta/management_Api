@@ -36,7 +36,7 @@ EmployeeKpi.belongsTo(Employee, { foreignKey: "emp_id" })
 
 sequelize
   .sync({
-    alter: true,
+    alter: false,
   })
   .then(() => {
     console.log("Database connected");

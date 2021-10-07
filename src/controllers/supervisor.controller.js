@@ -65,55 +65,58 @@ exports.updateSuper = async (req, res) => {
 
 exports.getEmpUnderSup = async (req, res) => {
     try {
-        console.log('req.params.supId', req.params.supId)
-        // const sup = await EmployeeKpi.findAndCountAll({
-        //     // where: { supervisor_id: req.params.supId },
-        //     // group: ["emp_id"],
-        //     right: true,
-        //     include: [/*{
-        //         model: Kpi_session,
-        //         where: { is_active: 1 },
-
-        //     },*/
-        //         {
-        //             model: Employee,
-        //             // where: {
-        //                 // supervisor_id: req.params.supId
-        //             // }
-        //         }]
-        // })
-
-        const sup = await Employee.findAndCountAll({
-            where: {
-                supervisor_id: req.params.supId, id: {
-                    [Op.not]: req.params.supId
-                }
-            },
-           
-            include: {
-                model: EmployeeKpi,
-                required: false,
-                where: { supervisor_id: req.params.supId, emp_id: {
-                    [Op.ne]: `employee_kpi.givenby_id`
-                } },
-                include: {
-                    // right: true,
-                    model: Kpi_session,
-                    where: {is_active: 1}
+      console.log("req.params.supId", req.params.supId);
+      // const sup = await EmployeeKpi.findAndCountAll({
+      //     // where: { supervisor_id: req.params.supId },
+      //     // group: ["emp_id"],
+      //     right: true,
+      //     include: [/*{
+      //         model: Kpi_session,
+      //         where: { is_active: 1 },
+  
+      //     },*/
+      //         {
+      //             model: Employee,
+      //             // where: {
+      //                 // supervisor_id: req.params.supId
+      //             // }
+      //         }]
+      // })
+  
+      const sup = await Employee.findAndCountAll({
+        where: {
+          supervisor_id: req.params.supId,
+          id: {
+            [Op.ne]: req.params.supId,
+          },
+        },
+        include: {
+          model: EmployeeKpi,
+          where: {
+            [Op.and]: [
+              { givenby_id: req.params.supId },
+              {
+                emp_id: {
+                    [Op.ne]: req.params.supId
                 },
-            },
-            group: ["employee.id","employee_kpi.id"],
-            attributes: { exclude: ["password"] }
-        }
-
-        )
-
-        if (!sup) {
-            return res.json(creatError.InternalServerError())
-        }
-        res.json({ data: sup })
+              },
+            ],
+          },
+          include: {
+            model: Kpi_session,
+            where: { is_active: 1 },
+          },
+        },
+        group: ["employee.id", "employee_kpi.id"],
+        attributes: { include: ["password"] },
+      });
+  
+      if (!sup) {
+        return res.json(creatError.InternalServerError());
+      }
+      res.json({ data: sup });
     } catch (error) {
-        console.log(error.message)
-        res.json(creatError.InternalServerError())
+      console.log(error.message);
+      res.json(creatError.InternalServerError());
     }
-}
+  };
