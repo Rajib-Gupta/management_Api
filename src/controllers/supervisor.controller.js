@@ -100,7 +100,7 @@ exports.getEmpUnderSup = async (req, res) => {
                     where: {is_active: 1}
                 },
             },
-            group: ["employee.id","employee_kpi.emp_id"],
+            group: ["employee.id","employee_kpi.id"],
             attributes: { exclude: ["password"] }
         }
 
