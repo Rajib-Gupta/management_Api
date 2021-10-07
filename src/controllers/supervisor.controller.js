@@ -89,7 +89,7 @@ exports.getEmpUnderSup = async (req, res) => {
                     [Op.not]: req.params.supId
                 }
             },
-            group: ["employee.id","employee_kpi.id"],
+           
             include: {
                 model: EmployeeKpi,
                 required: false,
@@ -100,6 +100,7 @@ exports.getEmpUnderSup = async (req, res) => {
                     where: {is_active: 1}
                 },
             },
+            group: ["employee.id","employee_kpi.id"],
             attributes: { exclude: ["password"] }
         }
 
