@@ -1,6 +1,6 @@
 const routes = require("express").Router()
 
-const { create, getEmployees, updateEmployee, getUserById, deleteEmployee, getEmployeeList } = require("../controllers/employee.controller")
+const { create, getEmployees, updateEmployee, getUserById, deleteEmployee,getEmployeeKpiCurrentDetails, getEmployeeList } = require("../controllers/employee.controller")
 const { uploads, imageUpload } = require("../controllers/image-upload.controller")
 const { addSupervisor, updateSuper, getEmpUnderSup } = require("../controllers/supervisor.controller")
 const { kpiSession, getSessionAndKpidetails,kpiDetailsEmployeeOwn,getKpiById, session, getKpiSuper, addSession, kpiDetails, getKpiDetails, kpiActiveSession, updateKpiDetails, kpideleteSession } = require("../controllers/kpi.controller")
@@ -34,6 +34,7 @@ routes.get('/getkpi-super', getKpiSuper)
 routes.get('/get-kpi-details-session/:year/:session', getSessionAndKpidetails)
 routes.get('/get-kpi-details/:id', getKpiById)
 routes.get('/get-kpi-data/:emp_id/:givenby_id', kpiDetailsEmployeeOwn)
+routes.post('/get-details-submitKpi',getEmployeeKpiCurrentDetails)
 
 // sign in route
 routes.post('/masterlogin', masterLogin)// add kpi
