@@ -89,7 +89,7 @@ exports.getEmpUnderSup = async (req, res) => {
                     [Op.not]: req.params.supId
                 }
             },
-            group: ["id","employee_kpi.id"],
+            group: ["employee.id","employee_kpi.id"],
             include: {
                 model: EmployeeKpi,
                 required: false,
