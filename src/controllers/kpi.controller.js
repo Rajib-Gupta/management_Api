@@ -186,6 +186,7 @@ exports.getSessionAndKpidetails = async (req, res) => {
     const { year, session } = req.params
     try {
         const [data, metadata] = await sequelize.query(`SELECT
+        kpi_ses.id as "kpiSessionId",
         kpi_ses.year,
         sess.session,
         kpi.id,
@@ -405,7 +406,34 @@ exports.kpiDetailsEmployeeOwn = async (req, res) => {
         if (!kpiData) {
             return res.status(404).json({ success: false, message: "Employee not Found!" })
         }
+      
+        kpiData.forEach(kpi => {
+            if (typeof kpi?.kpi_details === "string") {
+                kpi.kpi_details = JSON.parse(kpi.kpi_details)
+            }
+        });
+        
         // kpiData.kpi_details = JSON.parse(kpiData.kpi_details)
+        res.status(200).json({ success: true, kpiData, message: "Successfully Fetched!" })
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ success: false, error, message: creatError.InternalServerError() })
+    }
+}
+exports.kpiDetailsForAdmin = async (req, res) => {
+    const { emp_id, givenby_id, kpiSessionId } = req.params
+
+    try {
+        const [kpiData, metadata] = await sequelize.query(`SELECT kpi.id,kpi.emp_id,kpi.supervisor_id,kpi.givenby_id,kpi.kpi_details,kpi.createdAt,kpi.updatedAt,kpi.kpiSessionId,kpi_ses.id,kpi_ses.year,kpi_ses.is_active,kpi_ses.is_completed,kpi_ses.createdAt,kpi_ses.updatedAt,sess.*,kpi_ses.sessionId FROM employee_kpis AS kpi INNER JOIN kpi_sessions AS kpi_ses ON kpi.kpiSessionId = kpi_ses.id INNER JOIN sessions AS sess ON sess.id = kpi_ses.sessionId WHERE kpi.emp_id ="${emp_id}" AND kpi.givenby_id = "${givenby_id}" and kpi.kpiSessionId="${kpiSessionId}" GROUP by sess.id, kpi_ses.id, kpi.id`)
+        if (!kpiData) {
+            return res.status(404).json({ success: false, message: "Employee not Found!" })
+        }
+        //console.log("====================================>", kpiData)
+        if (typeof kpiData[0]?.kpi_details === "string") {
+            kpiData[0].kpi_details = JSON.parse(kpiData[0].kpi_details)
+        }
+
         res.status(200).json({ success: true, kpiData, message: "Successfully Fetched!" })
 
     } catch (error) {
